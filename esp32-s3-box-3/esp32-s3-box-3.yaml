@@ -765,6 +765,9 @@ display:
     model: st7789v
     invert_colors: true
     data_rate: 40MHz
+    dimensions:
+      height: 240
+      width: 320
     #cs_pin: 5
     dc_pin: 39
     #reset_pin:
