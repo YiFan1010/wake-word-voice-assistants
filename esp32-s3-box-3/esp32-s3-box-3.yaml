@@ -81,6 +81,9 @@ logger:
   hardware_uart: USB_SERIAL_JTAG
 
 wifi:
+  networks:
+  - ssid: "YUchen WIFI"
+    password: "1234567890"
   ap:
   on_connect:
     - script.execute: draw_display
