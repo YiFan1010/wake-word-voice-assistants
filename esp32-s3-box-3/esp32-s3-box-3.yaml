@@ -183,11 +183,81 @@ audio_adc:
     sample_rate: 16000
     address: 0x41
 
+switch:
+  - platform: template
+    name: "MIC1"
+    turn_on_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x09, 0x1F]   # 開啟 MIC1
+    turn_off_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x09, 0x00]   # 關閉 MIC1
+
+switch:
+  - platform: template
+    name: "MIC2"
+    turn_on_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x0A, 0x1F]   # 開啟 MIC2
+    turn_off_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x0A, 0x00]   # 關閉 MIC2
+
+switch:
+  - platform: template
+    name: "MIC3"
+    turn_on_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x0B, 0x1F]   # 開啟 MIC3
+    turn_off_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x0B, 0x00]   # 關閉 MIC3
+
+switch:
+  - platform: template
+    name: "MIC4"
+    turn_on_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x0C, 0x1F]   # 開啟 MIC4
+    turn_off_action:
+      - i2c.write:
+          address: 0x41
+          data: [0x0C, 0x00]   # 關閉 MIC4
+          
 audio_dac:
   - platform: es8311
     id: es8311_dac
     bits_per_sample: 16bit
     sample_rate: 48000
+
+number:
+  - platform: template
+    name: "Vol"
+    min_value: 0
+    max_value: 255
+    step: 1
+    initial_value: 191  # 0 dB 對應 0xBF (191)
+    set_action:
+      - lambda: |-
+          uint8_t vol = (uint8_t) x;
+          id(set_es8311_volume).execute(vol);
+
+script:
+  - id: set_es8311_volume
+    parameters:
+      vol: int
+    then:
+      - i2c.write:
+          address: 0x18
+          data: !lambda |-
+            return {0x17, (uint8_t)vol};
 
 microphone:
   - platform: i2s_audio
