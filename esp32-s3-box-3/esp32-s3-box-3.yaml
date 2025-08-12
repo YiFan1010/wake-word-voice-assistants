@@ -760,24 +760,24 @@ color:
 
 spi:
   - id: spi_bus
-    clk_pin: 41
-    mosi_pin: 40
+    clk_pin: GPIO41
+    mosi_pin: GPIO40
 
 display:
   - platform: ili9xxx
     id: s3_box_lcd
-    model: st7789v
+    model: ST7789V
     invert_colors: true
-    data_rate: 40MHz
+    data_rate: 80MHz
     dimensions:
       height: 240
       width: 320
     #cs_pin: 5
-    dc_pin: 39
+    dc_pin: GPIO39
     #reset_pin:
       #number: 48
       #inverted: true
-    #update_interval: never
+    update_interval: never
     pages:
       - id: idle_page
         lambda: |-
