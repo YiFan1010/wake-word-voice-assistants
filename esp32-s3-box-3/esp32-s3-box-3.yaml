@@ -159,7 +159,7 @@ switch:
       pca9554: my_pca9557_io
       number: 1 # 對應PCA9557的IO1
       mode: OUTPUT
-      inverted: false
+      inverted: true
       
 switch:
   - platform: gpio
