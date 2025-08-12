@@ -182,30 +182,13 @@ audio_adc:
     bits_per_sample: 16bit
     sample_rate: 16000
     address: 0x41
-
-switch:
-  - platform: template
-    name: "MIC1"
-    turn_on_action:
-      - i2c.write:
-          address: 0x41
-          data: [0x09, 0x1F]   # 開啟 MIC1
-    turn_off_action:
-      - i2c.write:
-          address: 0x41
-          data: [0x09, 0x00]   # 關閉 MIC1
-
-switch:
-  - platform: template
-    name: "MIC2"
-    turn_on_action:
-      - i2c.write:
-          address: 0x41
-          data: [0x0A, 0x1F]   # 開啟 MIC2
-    turn_off_action:
-      - i2c.write:
-          address: 0x41
-          data: [0x0A, 0x00]   # 關閉 MIC2
+ 
+i2c.write:
+  address: 0x41
+  data: [0x0B, 0x00]  # 關閉 MIC3
+- i2c.write:
+  address: 0x41
+  data: [0x0C, 0x00]  # 關閉 MIC4
 
 switch:
   - platform: template
