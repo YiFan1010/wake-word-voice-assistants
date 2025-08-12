@@ -561,12 +561,6 @@ script:
             - lambda: id(voice_assistant_phase) = ${voice_assist_muted_phase_id};
 
 switch:
-  - platform: gpio
-    name: Speaker Enable
-    pin: GPIO37
-    restore_mode: RESTORE_DEFAULT_ON
-    entity_category: config
-    disabled_by_default: true
   - platform: template
     name: Mute
     id: mute
