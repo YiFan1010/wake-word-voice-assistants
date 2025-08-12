@@ -134,6 +134,41 @@ light:
 i2c:
   scl: GPIO2
   sda: GPIO1
+  scan: true
+
+pca9554:
+  - id: my_pca9557_io
+    address: 0x19 # 設定PCA9557的I2C位址
+    pin_count: 8
+
+switch:
+  - platform: gpio
+    name: "ST7789V CS"
+    id: st7789v_cs_pin
+    pin:
+      pca9554: my_pca9557_io
+      number: 0 # 對應PCA9557的IO0
+      mode: OUTPUT
+      inverted: false
+
+switch:
+  - platform: gpio
+    name: "Audio Amplifier PAEN"
+    id: audio_paen_pin
+    pin:
+      pca9554: my_pca9557_io
+      number: 1 # 對應PCA9557的IO1
+      mode: OUTPUT
+      inverted: false
+      
+switch:
+  - platform: gpio
+    name: "PCA9557 cam"
+    pin:
+      pca9554: my_pca9557_io
+      number: 2
+      mode: OUTPUT
+      inverted: true
 
 i2s_audio:
   - id: i2s_audio_bus
@@ -772,7 +807,7 @@ display:
     dimensions:
       height: 240
       width: 320
-    #cs_pin: 5
+    cs_pin: st7789v_cs_pin
     dc_pin: GPIO39
     #reset_pin:
       #number: 48
