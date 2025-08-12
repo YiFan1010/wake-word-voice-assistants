@@ -220,28 +220,6 @@ audio_dac:
     bits_per_sample: 16bit
     sample_rate: 48000
 
-number:
-  - platform: template
-    name: "Vol"
-    min_value: 0
-    max_value: 255
-    step: 1
-    initial_value: 191  # 0 dB 對應 0xBF (191)
-    set_action:
-      - lambda: |-
-          uint8_t vol = (uint8_t) x;
-          id(set_es8311_volume).execute(vol);
-
-script:
-  - id: set_es8311_volume
-    parameters:
-      vol: int
-    then:
-      - i2c.write:
-          address: 0x18
-          data: !lambda |-
-            return {0x17, (uint8_t)vol};
-
 microphone:
   - platform: i2s_audio
     id: box_mic
@@ -308,6 +286,20 @@ media_player:
             - script.execute: start_wake_word
             - script.execute: set_idle_or_mute_phase
             - script.execute: draw_display
+
+number:
+  - platform: template
+    id: volume_slider
+    name: "Volume"
+    min_value: 0.0 # 調整為浮點數，以匹配媒體播放器的音量範圍
+    max_value: 1.0 # 調整為浮點數，以匹配媒體播放器的音量範圍
+    step: 0.01 # 調整步長為 0.01，提供更細緻的控制
+    unit_of_measurement: "" # 移除單位，因為音量通常是0.0到1.0的浮點數
+    # 當滑桿的值被改變時，觸發以下動作
+    on_value:
+      - media_player.volume:
+          id: speaker_media_player
+          level: !lambda 'return x;' # 直接傳遞滑桿的浮點數值
 
 micro_wake_word:
   id: mww
