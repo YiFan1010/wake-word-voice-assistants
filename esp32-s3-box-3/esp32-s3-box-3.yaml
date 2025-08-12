@@ -146,6 +146,7 @@ audio_adc:
     id: es7210_adc
     bits_per_sample: 16bit
     sample_rate: 16000
+    address: 0x41
 
 audio_dac:
   - platform: es8311
