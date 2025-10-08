@@ -1,6 +1,0 @@
-.esphome/
-.DS_Store
-secrets.yaml
-*/.gitignore
-!/.gitignore
-venv/
