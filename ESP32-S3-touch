@@ -222,7 +222,7 @@ binary_sensor:
   - platform: homeassistant
     id: main_light
     entity_id: light.yeelink_sg_442933452_ceiling22_s_2_light #客廳主燈
-    # publish_initial_state: true
+    publish_initial_state: true
     on_state:
       then:
         lvgl.widget.update:
@@ -233,7 +233,7 @@ binary_sensor:
   - platform: homeassistant
     id: sub_light
     entity_id: light.xuan_guan_deng #玄關燈
-    # publish_initial_state: true
+    publish_initial_state: true
     on_state:
       then:
         lvgl.widget.update:
