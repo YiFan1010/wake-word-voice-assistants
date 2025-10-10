@@ -150,7 +150,12 @@ touchscreen:
           - lambda: |-
               id(backlight_dimmed) = false;
           - lvgl.resume:   # 若之前有 lvgl.pause，可解除暫停刷新
-          - logger.log: "螢幕被喚醒，亮度恢復 100%"       
+          - logger.log: "螢幕被喚醒，亮度恢復 100%"    
+
+bluetooth_proxy:
+
+esp32_ble_tracker:
+
 font:
   - file:
       type: gfonts
