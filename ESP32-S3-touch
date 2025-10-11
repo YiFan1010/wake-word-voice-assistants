@@ -192,7 +192,7 @@ text_sensor:
                     lambda: 'return id(backlight_dimmed);'
                   then:
                     - lvgl.widget.hide: idle_page
-                    - lvgl.page.show: main_page
+                    - lvgl.page.show: main_page 
                     - lvgl.resume:
                     - light.turn_on:
                         id: backlight
