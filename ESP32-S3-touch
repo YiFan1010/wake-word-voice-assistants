@@ -142,18 +142,18 @@ touchscreen:
 #              touch.x_raw,
 #              touch.y_raw
 #              );
-  on_touch:
-    - if:
-        condition:
-          lambda: 'return id(backlight_dimmed);'
-        then:
-          - light.turn_on:
-              id: backlight
-              brightness: 100%   # 恢復亮度
-          - lambda: |-
-              id(backlight_dimmed) = false;
-          - lvgl.resume:   # 若之前有 lvgl.pause，可解除暫停刷新
-          - logger.log: "螢幕被喚醒，亮度恢復 100%"       
+#  on_touch:
+#    - if:
+#        condition:
+#          lambda: 'return id(backlight_dimmed);'
+#        then:
+#          - light.turn_on:
+#              id: backlight
+#              brightness: 100%   # 恢復亮度
+#          - lambda: |-
+#              id(backlight_dimmed) = false;
+#          - lvgl.resume:   # 若之前有 lvgl.pause，可解除暫停刷新
+#          - logger.log: "螢幕被喚醒，亮度恢復 100%"       
 
 bluetooth_proxy:
 
@@ -187,13 +187,18 @@ text_sensor:
             condition:
               lambda: 'return id(backlight_dimmed);'
             then:
-              - light.turn_on:
-                  id: backlight
-                  brightness: 100%   # 恢復亮度
-              - lambda: |-
-                  id(backlight_dimmed) = false;
-              - lvgl.resume:   # 若之前有 lvgl.pause，可解除暫停刷新
-              - logger.log: "語音助手啟動" 
+              - if:
+                  condition:
+                    lambda: 'return id(backlight_dimmed);'
+                  then:
+                    - lvgl.widget.hide: idle_page
+                    - lvgl.page.show: main_page 
+                    - light.turn_on:
+                        id: backlight
+                        brightness: 100%   # 恢復亮度
+                    - lambda: |-
+                        id(backlight_dimmed) = false;
+                    - logger.log: "語音助手啟動"
         - if:
             condition:
               lambda: 'return id(ha_state_raw).state == "listening";'
@@ -338,11 +343,35 @@ lvgl:
             - light.turn_on:
                 id: backlight
                 brightness: 30%   # 降亮
+            - lvgl.widget.show: idle_page    
             - lambda: |-
                 id(backlight_dimmed) = true;
             - logger.log: "螢幕閒置 30 秒，亮度降至 30%"  # on_idle:
-            - lvgl.pause:
+            #- lvgl.pause:
   page_wrap: true
+##############################################################################################待機頁##########################################################################################################
+  top_layer:
+    widgets:
+      - obj:
+          id: idle_page
+          bg_color: 0x000000
+          bg_opa: 0
+          width: 320
+          height: 240
+          on_click:
+            - if:
+                condition:
+                  lambda: 'return id(backlight_dimmed);'
+                then:
+                  - lvgl.widget.hide: idle_page
+                  - lvgl.page.show: main_page 
+                  - light.turn_on:
+                      id: backlight
+                      brightness: 100%   # 恢復亮度
+                  - lambda: |-
+                      id(backlight_dimmed) = false;
+                  - logger.log: "螢幕被喚醒，亮度恢復 100%"
+#          - lvgl.resume:   # 若之前有 lvgl.pause，可解除暫停刷新              
 ##############################################################################################主頁##########################################################################################################
   pages:
     - id: main_page
@@ -357,6 +386,8 @@ lvgl:
             text_color: 0xFFFFFF
             width: 310
             height: 35
+            x: 5
+            y: 5
             border_width: 2
             border_color: 0x505050
             radius: 10 
@@ -365,7 +396,7 @@ lvgl:
             width: 310
             height: 200
             x: 5
-            y: 35
+            y: 40
             # pad_all: 3
             bg_opa: TRANSP
             border_opa: TRANSP  #cover #TRANSP
