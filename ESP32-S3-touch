@@ -395,7 +395,7 @@ lvgl:
             align: TOP_LEFT
             width: 310
             height: 200
-            x: 5
+            x: 10
             y: 40
             # pad_all: 3
             bg_opa: TRANSP
