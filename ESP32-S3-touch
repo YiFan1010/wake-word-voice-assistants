@@ -1,11 +1,15 @@
 substitutions:
-  top_left_entity_id: light.yeelink_sg_442933452_ceiling22_s_2_light
-  top_left_action: light.toggle
+  top_left_entity_id: light.yeelink_sg_442933452_ceiling22_s_2_light #左上實體id
+  top_left_icon: "\U000f06e9"                                          #左上圖示(依font設定或新增)
+  top_left_action: light.toggle                                      #左上動作(依ha設定)
   bottom_left_entity_id: light.xuan_guan_deng
+  bottom_left_icon: "\U000f06e9"
   bottom_left_action: light.toggle 
   top_right_entity_id: entityid
+  top_right_icon: "\U000f033e"
   top_right_action: action
   bottom_right_entity_id: entityid
+  bottom_right_icon: "\U000f033e"
   bottom_right_action: action
   allowed_characters: "玄關客廳主燈大門上解鎖聆聽中處理回應等待命開機完成已切換"
 
@@ -358,7 +362,7 @@ lvgl:
                     - label:
                         text_font: font_icon_26
                         align: top_left
-                        text: "\U000f06e9"    #light
+                        text: ${top_left_icon}    #light
                         id: lv_button_top_left_icon
                     - label:
                         text_font: font_cn_20
@@ -380,7 +384,7 @@ lvgl:
                     - label:
                         text_font: font_icon_26
                         align: top_left
-                        text: "\U000f06e9"    #light
+                        text: ${bottom_left_icon}     #light
                         id: lv_button_bottom_left_icon
                     - label:
                         text_font: font_cn_20
@@ -402,7 +406,7 @@ lvgl:
                     - label:
                         text_font: font_icon_26
                         align: top_left
-                        text: "\U000f033e"    #lock
+                        text: ${top_right_icon}     #lock
                         id: lv_button_top_right_icon
                     - label:
                         text_font: font_cn_20
@@ -424,7 +428,7 @@ lvgl:
                     - label:
                         text_font: font_icon_26
                         align: top_left
-                        text: "\U000f033e"     #lock
+                        text: ${bottom_right_icon}     #lock
                         id: lv_button_bottom_right_icon
                     - label:
                         text_font: font_cn_20
@@ -443,9 +447,17 @@ script:
     parameters:
       text: string
     then:
+      - if:
+          condition:
+            lambda: 'return id(backlight_dimmed);'
+          then:
+            - light.turn_on:
+                id: backlight
+                brightness: 100%   # 恢復亮度
       - lvgl.label.update:
           id: top_label
-          text: !lambda 'return text;'   
+          text: !lambda 'return text;' 
+      - lvgl.resume:   
     # 點亮螢幕，取消待機      
   - id: light_up_tft
     then:
