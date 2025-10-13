@@ -152,9 +152,18 @@ voice_assistant:
         id: text_response
         state: "..."
 #    - script.execute: draw_display
+    - script.execute:
+         id: light_up_tft
+    - logger.log: "語音助手啟動"
+    - script.execute:
+         id: top_label_msg
+         text: "聆聽中"
   on_stt_vad_end:
     - lambda: id(voice_assistant_phase) = ${voice_assist_thinking_phase_id};
 #    - script.execute: draw_display
+    - script.execute:
+         id: top_label_msg
+         text: "處理中"
   on_stt_end:
     - text_sensor.template.publish:
         id: text_request
@@ -166,6 +175,9 @@ voice_assistant:
         state: !lambda return x;
     - lambda: id(voice_assistant_phase) = ${voice_assist_replying_phase_id};
 #    - script.execute: draw_display
+    - script.execute:
+         id: top_label_msg
+         text: "回應中"
   on_end:
     # Wait a short amount of time to see if an announcement starts
     - wait_until:
@@ -188,6 +200,9 @@ voice_assistant:
           - micro_wake_word.start:
     - script.execute: set_idle_or_mute_phase
 #    - script.execute: draw_display
+    - script.execute:
+         id: top_label_msg
+         text: "待命中"
     # Clear text sensors
     - text_sensor.template.publish:
         id: text_request
