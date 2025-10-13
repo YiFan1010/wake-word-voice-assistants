@@ -1,9 +1,37 @@
+substitutions:
+  top_left_entity_id: light.yeelink_sg_442933452_ceiling22_s_2_light
+  top_left_action: light.toggle
+  bottom_left_entity_id: light.xuan_guan_deng
+  bottom_left_action: light.toggle 
+  top_right_entity_id: entityid
+  top_right_action: action
+  bottom_right_entity_id: entityid
+  bottom_right_action: action
+  allowed_characters: "玄關客廳主燈大門上解鎖聆聽中處理回應等待命開機完成已切換"
+
+font:
+  - file:
+      type: gfonts
+      family: Noto Sans TC
+    id: font_cn_20
+    size: 20
+    glyphs: 
+      - ${allowed_characters}
+  - file: 'fonts/materialdesignicons-webfont.ttf'
+    id: font_icon_26
+    size: 26
+    glyphs: [
+      "\U000f06e9", # light
+      "\U000f033e", # lock
+      "\U000f06a5", # plug
+    ]
+
 packages:
   audio: !include services/esp32-s3-box-3.yaml   #ha語音助手
 
 esphome:
-  name: esp32-tft-display
-  friendly_name: esp32-tft-display
+  name: esp32-s3-touch
+  friendly_name: esp32-s3-touch
 #   platformio_options:
 #     build_flags: "-DBOARD_HAS_PSRAM"
 #     board_build.arduino.memory_type: qio_opi
@@ -159,75 +187,7 @@ bluetooth_proxy:
 
 esp32_ble_tracker:
 
-font:
-  - file:
-      type: gfonts
-      family: Noto Sans TC
-    id: font_cn_20
-    size: 20
-    glyphs: [ 
-          "玄關","客廳","主燈","大門","上解鎖","聆聽中","處理","回應","等待命","開機完成","已切換"
-          ]
-  - file: 'fonts/materialdesignicons-webfont.ttf'
-    id: font_icon_26
-    size: 26
-    glyphs: [
-      "\U000f06e9", # light
-      "\U000f033e", # lock
-    ]
-
 text_sensor:
-#################################語音助手相關################################
-  - platform: homeassistant
-    id: ha_state_raw
-    entity_id: assist_satellite.esp32_s3_box_3_a5dcc0_assist_satellite
-    on_value:
-      then:
-        - if:
-            condition:
-              lambda: 'return id(backlight_dimmed);'
-            then:
-              - if:
-                  condition:
-                    lambda: 'return id(backlight_dimmed);'
-                  then:
-                    - lvgl.widget.hide: idle_page
-                    - lvgl.page.show: main_page 
-                    - lvgl.resume:
-                    - light.turn_on:
-                        id: backlight
-                        brightness: 100%   # 恢復亮度
-                    - lambda: |-
-                        id(backlight_dimmed) = false;
-                    - logger.log: "語音助手啟動"
-        - if:
-            condition:
-              lambda: 'return id(ha_state_raw).state == "listening";'
-            then:
-              - lvgl.label.update:
-                  id: va_status_label
-                  text: "聆聽中"
-        - if:
-            condition:
-              lambda: 'return id(ha_state_raw).state == "processing";'
-            then:
-              - lvgl.label.update:
-                  id: va_status_label
-                  text: "處理中"
-        - if:
-            condition:
-              lambda: 'return id(ha_state_raw).state == "responding";'
-            then:
-              - lvgl.label.update:
-                  id: va_status_label
-                  text: "回應中"
-        - if:
-            condition:
-              lambda: 'return id(ha_state_raw).state == "idle";'
-            then:
-              - lvgl.label.update:
-                  id: va_status_label
-                  text: "待命中"
 #################################門鎖相關################################
   - platform: homeassistant
     id: lock_state_raw
@@ -239,30 +199,30 @@ text_sensor:
               lambda: 'return id(lock_state_raw).state == "locked";'
             then:
               - lvgl.widget.update:
-                  id: lv_button_lock
+                  id: lv_button_top_right
                   state:
                     checked: true
               - lvgl.widget.update:
-                  id: lv_button_unlock
+                  id: lv_button_bottom_right
                   state:
                     checked: false
-              - lvgl.label.update:
-                  id: va_status_label
+              - script.execute:
+                  id: top_label_msg
                   text: "上鎖完成"
         - if:
             condition:
               lambda: 'return id(lock_state_raw).state == "unlocked";'
             then:
               - lvgl.widget.update:
-                  id: lv_button_lock
+                  id: lv_button_top_right
                   state:
                     checked: false
               - lvgl.widget.update:
-                  id: lv_button_unlock
+                  id: lv_button_bottom_right
                   state:
                     checked: true
-              - lvgl.label.update:
-                  id: va_status_label
+              - script.execute:
+                  id: top_label_msg
                   text: "解鎖完成"
         - if:
             condition:
@@ -271,36 +231,36 @@ text_sensor:
                 - lambda: 'return id(lock_state_raw).state != "unlocked";'
             then:
               - lvgl.widget.update:
-                  id: lv_button_lock
+                  id: lv_button_top_right
                   state:
                     checked: true
               - lvgl.widget.update:
-                  id: lv_button_unlock
+                  id: lv_button_bottom_right
                   state:
                     checked: true
 
 binary_sensor:
-#################################客廳主燈相關################################
+#################################左上相關################################
   - platform: homeassistant
-    id: main_light
-    entity_id: light.yeelink_sg_442933452_ceiling22_s_2_light #客廳主燈
+    id: ha_top_left
+    entity_id: ${top_left_entity_id} 
     publish_initial_state: true
     on_state:
       then:
         - lvgl.widget.update:
-            id: lv_button_main_light
+            id: lv_button_top_left
             state:
               checked: !lambda return x;
 
-#################################玄關燈相關################################
+#################################左下燈相關################################
   - platform: homeassistant
-    id: sub_light
-    entity_id: light.xuan_guan_deng #玄關燈
+    id: ha_bottom_left
+    entity_id: ${bottom_left_entity_id} 
     publish_initial_state: true
     on_state:
       then:
         - lvgl.widget.update:
-            id: lv_button_sub_light
+            id: lv_button_bottom_left
             state:
               checked: !lambda return x;   
 
@@ -337,18 +297,8 @@ lvgl:
   on_idle:
     timeout: 30000ms   # 閒置 30 秒
     then:
-      - if:
-          condition:
-            lambda: 'return !id(backlight_dimmed);'
-          then:
-            - light.turn_on:
-                id: backlight
-                brightness: 30%   # 降亮
-            - lvgl.widget.show: idle_page    
-            - lambda: |-
-                id(backlight_dimmed) = true;
-            - logger.log: "螢幕閒置 30 秒，亮度降至 30%"  # on_idle:
-            #- lvgl.pause:
+      - script.execute:
+          id: light_down_tft
   page_wrap: true
 ##############################################################################################待機頁##########################################################################################################
   top_layer:
@@ -360,19 +310,8 @@ lvgl:
           width: 320
           height: 240
           on_click:
-            - if:
-                condition:
-                  lambda: 'return id(backlight_dimmed);'
-                then:
-                  - lvgl.widget.hide: idle_page
-                  - lvgl.page.show: main_page 
-                  - light.turn_on:
-                      id: backlight
-                      brightness: 100%   # 恢復亮度
-                  - lambda: |-
-                      id(backlight_dimmed) = false;
-                  - logger.log: "螢幕被喚醒，亮度恢復 100%"
-#          - lvgl.resume:   # 若之前有 lvgl.pause，可解除暫停刷新              
+            - script.execute:
+                id: light_up_tft            
 ##############################################################################################主頁##########################################################################################################
   pages:
     - id: main_page
@@ -380,7 +319,7 @@ lvgl:
 ########################################################################################提示框##############################################################################################################
         - label:
             text_font: font_cn_20
-            id: va_status_label
+            id: top_label
             text: "等待開機"
             align: TOP_LEFT
             bg_color: 0x303030
@@ -414,13 +353,13 @@ lvgl:
                   height: 90
                   width: 145
                   checkable: true
-                  id: lv_button_main_light
+                  id: lv_button_top_left
                   widgets:
                     - label:
                         text_font: font_icon_26
                         align: top_left
                         text: "\U000f06e9"    #light
-                        id: lv_button_main_light_icon
+                        id: lv_button_top_left_icon
                     - label:
                         text_font: font_cn_20
                         align: bottom_right
@@ -428,21 +367,21 @@ lvgl:
                         long_mode: dot
                   on_click:
                   - homeassistant.action:
-                      action: light.toggle
+                      action: ${top_left_action}
                       data:
-                        entity_id: light.yeelink_sg_442933452_ceiling22_s_2_light
+                        entity_id: ${top_left_entity_id}
 #############################################################################################左下########################################################################################################
               - button:
                   height: 90
                   width: 145
                   checkable: true
-                  id: lv_button_sub_light
+                  id: lv_button_bottom_left
                   widgets:
                     - label:
                         text_font: font_icon_26
                         align: top_left
                         text: "\U000f06e9"    #light
-                        id: lv_button_sub_light_icon
+                        id: lv_button_bottom_left_icon
                     - label:
                         text_font: font_cn_20
                         align: bottom_right
@@ -450,21 +389,21 @@ lvgl:
                         long_mode: dot
                   on_click:
                   - homeassistant.action:
-                      action: light.toggle
+                      action: ${bottom_left_action}
                       data:
-                        entity_id: light.xuan_guan_deng
+                        entity_id: ${bottom_left_entity_id}
 #############################################################################################右上########################################################################################################
               - button:
                   height: 90
                   width: 145
                   checkable: true
-                  id: lv_button_lock
+                  id: lv_button_top_right
                   widgets:
                     - label:
                         text_font: font_icon_26
                         align: top_left
                         text: "\U000f033e"    #lock
-                        id: lv_button_lock_icon
+                        id: lv_button_top_right_icon
                     - label:
                         text_font: font_cn_20
                         align: bottom_right
@@ -480,13 +419,13 @@ lvgl:
                   height: 90
                   width: 145
                   checkable: true
-                  id: lv_button_unlock
+                  id: lv_button_bottom_right
                   widgets:
                     - label:
                         text_font: font_icon_26
                         align: top_left
                         text: "\U000f033e"     #lock
-                        id: lv_button_unlock_icon
+                        id: lv_button_bottom_right_icon
                     - label:
                         text_font: font_cn_20
                         align: bottom_right
@@ -497,4 +436,43 @@ lvgl:
                         action: lock.unlock
                         data:
                           entity_id: lock.lock_77a6
-         
+###########################################################################################script######################################################################################
+script:
+  # top_lable顯示訊息
+  - id: top_label_msg
+    parameters:
+      text: string
+    then:
+      - lvgl.label.update:
+          id: top_label
+          text: !lambda 'return text;'   
+    # 點亮螢幕，取消待機      
+  - id: light_up_tft
+    then:
+      - if:
+          condition:
+            lambda: 'return id(backlight_dimmed);'
+          then:
+            - lvgl.widget.hide: idle_page
+            - lvgl.page.show: main_page 
+            - light.turn_on:
+                id: backlight
+                brightness: 100%   # 恢復亮度
+            - lambda: |-
+                id(backlight_dimmed) = false;
+            - logger.log: "螢幕被喚醒，亮度恢復 100%"
+            - lvgl.resume:     
+    # 螢幕變暗，進入待機      
+  - id: light_down_tft
+    then:
+      - if:
+          condition:
+            lambda: 'return !id(backlight_dimmed);'
+          then:
+            - light.turn_on:
+                id: backlight
+                brightness: 30%   # 降亮
+            - lvgl.widget.show: idle_page    
+            - lambda: |-
+                id(backlight_dimmed) = true;
+            - logger.log: "螢幕閒置 30 秒，亮度降至 30%"  # on_idle: 
