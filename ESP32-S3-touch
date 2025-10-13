@@ -454,6 +454,8 @@ script:
             - light.turn_on:
                 id: backlight
                 brightness: 100%   # 恢復亮度
+            - lambda: |-
+                id(backlight_dimmed) = false;
       - lvgl.label.update:
           id: top_label
           text: !lambda 'return text;' 
