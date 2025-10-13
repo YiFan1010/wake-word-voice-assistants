@@ -152,8 +152,6 @@ voice_assistant:
         id: text_response
         state: "..."
 #    - script.execute: draw_display
-    - script.execute:
-         id: light_up_tft
     - logger.log: "語音助手啟動"
     - script.execute:
          id: top_label_msg
